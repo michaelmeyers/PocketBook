@@ -112,9 +112,10 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
             guard let amountDifference = amountDifference(goalAmount: plannedExpense.goalAmount, initialAmount: totalDeposited),
                 let calculatedMonthsToDueDate = calculatedMonthsToDueDate(dueDate: plannedExpense.dueDate, currentDate: Date()) else { return }
             
-            
+            let goalAmount = plannedExpense.goalAmount
+            let initialAmount = plannedExpense.initialAmount
             let monthlyContribution = (amountDifference / Double(calculatedMonthsToDueDate))
-            if monthlyContribution > 0 {
+            if monthlyContribution > 0 && (goalAmount - initialAmount > 0) {
                 calculatedContributionlabel.text = "\(formatNumberToString(fromDouble: monthlyContribution))"
             } else {
                 idealMonthlyContributionAmountLabel.text = "Congratulations! You have reached your goal!"

@@ -61,14 +61,7 @@ class PlannedExpenseListViewController: UIViewController, UITableViewDataSource,
     
     @objc func updateViews() {
         let totalMonthlyContribution = PlannedExpenseController.shared.calculateTotalMonthlyContribution()
-        DispatchQueue.main.async {
-            if totalMonthlyContribution <= 0.0 {
-                self.amountLabel.text = "\("$0.00")"
-                
-            } else {
-                self.amountLabel.text = "\(formatNumberToString(fromDouble: totalMonthlyContribution))"
-            }
-        }
+        self.amountLabel.text = "\(formatNumberToString(fromDouble: totalMonthlyContribution))"
     }
     
     func createPlusButton() {

@@ -39,8 +39,12 @@ class PlannedExpenseController {
         for plannedExpense in plannedExpenses {
             guard let amountDifference = amountDifference(goalAmount: plannedExpense.goalAmount, currentAmount: (plannedExpense.initialAmount)),
                 let calculatedMonthsToDueDate = calculatedMonthsToDueDate(dueDate: plannedExpense.dueDate, currentDate: Date()) else { return 0.0 }
-            let monthlyContribution = (amountDifference / Double(calculatedMonthsToDueDate))
-            totalIdealContribution += monthlyContribution
+            var monthlyContribution = (amountDifference / Double(calculatedMonthsToDueDate))
+            if monthlyContribution <= 0.0 {
+             monthlyContribution = 0.0
+            } else {
+                totalIdealContribution += monthlyContribution
+            }
         }
         return totalIdealContribution
     }
