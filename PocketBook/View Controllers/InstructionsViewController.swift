@@ -18,10 +18,10 @@ class InstructionsViewController: UIPageViewController, UIPageViewControllerDele
     
     lazy var orderedViewControllers: [UIViewController] = {
         return [self.newVc(viewController: "accountsInstruction"),
-                self.newVc(viewController: "analysisInstruction"),
+                self.newVc(viewController: "budgetItemsInstruction"),
                 self.newVc(viewController: "transactionsInstruction"),
                 self.newVc(viewController: "plannedExpensesInstruction"),
-                self.newVc(viewController: "budgetItemsInstruction")]
+                self.newVc(viewController: "analysisInstruction")]
     }()
     
     override func viewDidLoad() {
@@ -42,7 +42,7 @@ class InstructionsViewController: UIPageViewController, UIPageViewControllerDele
     func configurePageControl() {
         
         // The total number of pages that are available is based on number view controllers
-        pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 150,width: UIScreen.main.bounds.width,height: 50))
+        pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 100,width: UIScreen.main.bounds.width,height: 50))
         self.pageControl.numberOfPages = orderedViewControllers.count
         self.pageControl.currentPage = 0
         self.pageControl.tintColor = UIColor.darkGray
