@@ -50,8 +50,13 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
         super.viewDidLoad()
         if let plannedExpense = plannedExpense {
             self.navigationItem.title = plannedExpense.name.uppercased()
+            self.navigationItem.rightBarButtonItem?.title = "Update"
         } else {
             self.navigationItem.title = "Create New Savings Goal".uppercased()
+            depositButton.isHidden = true
+            withdrawButton.isHidden = true
+            completeButton.isHidden = true
+            self.navigationItem.rightBarButtonItem?.title = "Save"
         }
        setUpUI()
     }
@@ -149,11 +154,11 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
                 let name = nameTextField.text, !name.isEmpty else {return}
             
             guard let goalAmount = Double(removeCharactersFromTextField(goalAmountTextField)) else {
-                goalAmountTextField.backgroundColor = UIColor.red
+                goalAmountTextField.backgroundColor = UIColor.lightPink
                 return
             }
             guard let initialAmount = Double(removeCharactersFromTextField(initialAmountTextField)) else {
-                initialAmountTextField.backgroundColor = UIColor.red
+                initialAmountTextField.backgroundColor = UIColor.lightPink
                 return
             }
             
@@ -166,18 +171,18 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
             // Create
             
             guard let name = nameTextField.text, let account = txtAccountPicker.text, !name.isEmpty, !account.isEmpty else {
-                if nameTextField.text == "" {nameTextField.backgroundColor = UIColor.red}
-                if txtAccountPicker.text == "" {txtAccountPicker.backgroundColor = UIColor.red}
+                if nameTextField.text == "" {nameTextField.backgroundColor = UIColor.lightPink}
+                if txtAccountPicker.text == "" {txtAccountPicker.backgroundColor = UIColor.lightPink}
                 return
             }
             
             guard let goalAmount = Double(removeCharactersFromTextField(goalAmountTextField)) else {
-                goalAmountTextField.backgroundColor = UIColor.red
+                goalAmountTextField.backgroundColor = UIColor.lightPink
                 return
             }
             
             guard let initialAmount = Double(removeCharactersFromTextField(initialAmountTextField)) else {
-                initialAmountTextField.backgroundColor = UIColor.red
+                initialAmountTextField.backgroundColor = UIColor.lightPink
                 return
             }
             
@@ -230,6 +235,8 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
             plannedExpense.totalDeposited += amountDeposited
             
             PlannedExpenseController.shared.updatePlannedExpenseWith(name: plannedExpense.name, account: plannedExpense.account, initialAmount: plannedExpense.initialAmount, goalAmount: plannedExpense.goalAmount, amountDeposited: amountDeposited, amountWithdrawn: 0.0, totalDeposited: plannedExpense.totalDeposited, dueDate: plannedExpense.dueDate, plannedExpense: plannedExpense, completion: { (_) in })
+            
+            self.navigationController?.popViewController(animated: true)
         }
         
         depositAlertController.addAction(addAction)
@@ -271,6 +278,8 @@ class PlannedExpenseViewController: UIViewController, UIPickerViewDelegate, UIPi
             plannedExpense.totalDeposited -= amount
             
             PlannedExpenseController.shared.updatePlannedExpenseWith(name: plannedExpense.name, account: plannedExpense.account, initialAmount: plannedExpense.initialAmount, goalAmount: plannedExpense.goalAmount, amountDeposited: 0.0, amountWithdrawn: amount, totalDeposited: plannedExpense.totalDeposited, dueDate: plannedExpense.dueDate, plannedExpense: plannedExpense, completion: { (_) in })
+            
+            self.navigationController?.popViewController(animated: true)
         }
         
         withdrawalAlertController.addAction(addAction)
