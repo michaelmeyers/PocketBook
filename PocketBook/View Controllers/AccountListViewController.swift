@@ -64,7 +64,6 @@ class AccountListViewController: UIViewController, UITableViewDelegate, UITableV
             self.updateArrays()
             animateTableView(forTableView: self.tableView, withBooleanCounter: self.booleanCounterForTableViewAnimation)
             self.noDataImageSetup()
-            self.setUpUI()
         }
         setUpTransferFundsView()
     }
@@ -114,7 +113,6 @@ class AccountListViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func reloadTableView() {
         DispatchQueue.main.async {
             self.updateArrays()
-          //  self.tableView.reloadData()
             self.fromPickerView.reloadAllComponents()
             self.toPickerView.reloadAllComponents()
             self.payDayPickerView.reloadAllComponents()
@@ -498,6 +496,7 @@ class AccountListViewController: UIViewController, UITableViewDelegate, UITableV
             let account = payDayAccount else {return}
         
         account.total += amount
+        setUpUI()
         tableView.reloadData()
         AccountController.shared.updateAccountWith(name: account.name, type: account.accountType, total: account.total, account: account) { (_) in
             // Nothing to do.
