@@ -64,6 +64,7 @@ class AccountListViewController: UIViewController, UITableViewDelegate, UITableV
             self.updateArrays()
             animateTableView(forTableView: self.tableView, withBooleanCounter: self.booleanCounterForTableViewAnimation)
             self.noDataImageSetup()
+            self.setUpUI()
         }
         setUpTransferFundsView()
     }
