@@ -5,17 +5,6 @@
 //  Created by Laura O'Brien on 11/6/17.
 //  Copyright © 2017 SPARQ. All rights reserved.
 //
-
-
-//NOTE: Text field heights and Account picker height are not adjusted for iPad v. iPhone aspects. All other label font sizes will adjust appropriately.
-
-
-//NOTE: save button to OverviewVC segue is called "saveAccountChangeSegue"
-//NOTE: cancel button to OverviewVC segue is called "cancelAccountChangeSegue"
-
-
-// fix me
-
 import UIKit
 
 class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, UIGestureRecognizerDelegate {
@@ -31,6 +20,7 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
     @IBOutlet weak var transferFundsButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var transferButton: UIButton!
+    @IBOutlet weak var payMeOffButton: UIButton!
     
     // MARK: - Customize Segmented Control
     func customizeSegmentedControl() {
@@ -58,6 +48,10 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
             self.navigationItem.title = "Create New Account".uppercased()
         }
         setUpUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.tintColor = .white
     }
     
     // MARK: - Picker View Delegate and DataSource
@@ -170,6 +164,11 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
         checkSave()
     }
     
+    @IBAction func payMeOffButton(_ sender: Any) {
+        presentPayMeOffAlert()
+    }
+    
+    
     @IBAction func transferFundsButton(_ sender: UIButton) {
         transferMoneyView.isHidden = false
         transferFundsButton.isHidden = true
@@ -219,8 +218,6 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
     
     // MARK: - Methods
     func setUpUI() {
-        self.navigationController?.navigationBar.tintColor = .white
-        
         setDelegates()
         roundButtons()
         transferMoneyView.isHidden = true
@@ -235,14 +232,68 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
         if account == nil {
             transferFundsButton.isHidden = true
         }
+        
+        
         // Check to see if there is an account
         guard let account = account else {return}
+        
+        if account.accountType != AccountType.Credit.rawValue {
+            payMeOffButton.isHidden = true
+        } else {
+            transferFundsButton.isHidden = true
+        }
         
         // If there is an account update the views
         nameTextField.text = account.name
         let totalString = formatNumberToString(fromDouble: account.total)
         totalTextField.text = totalString
         accountTypeSegmentedControl.selectedSegmentIndex = updateAccountTypeSegment()
+    }
+    
+    func presentPayMeOffAlert() {
+        var amountTextField: UITextField!
+        var payeeTextField: UITextField!
+        
+        guard let account = account else {return}
+        let alert = UIAlertController(title: "Pay Off \(account.name)", message: "This will create a transaction for you", preferredStyle: .alert)
+        
+        alert.addTextField { (textField) in
+            textField.placeholder = "50"
+            textField.keyboardType = .decimalPad
+            amountTextField = textField
+        }
+        
+        alert.addTextField { (textField) in
+            textField.placeholder = "Capital One"
+            textField.autocapitalizationType = .words
+            textField.autocorrectionType = UITextAutocorrectionType.yes
+            payeeTextField = textField
+        }
+        
+        let addAction = UIAlertAction(title: "Pay Now", style: .default) { (_) in
+            // Subtract from the account
+            let amountString = removeCharactersFromTextField(amountTextField)
+            guard let amountToSubtract = Double(amountString) else {
+                presentSimpleAlert(controllerToPresentAlert: self, title: "Warning", message: "You entered an invalid amount")
+                return
+            }
+            account.total -= amountToSubtract
+            AccountController.shared.updateAccountWith(name: account.name, type: account.accountType, total: account.total, account: account, completion: { (_) in })
+            
+            // Create a transaction
+            guard let payee = payeeTextField.text else {return}
+            TransactionController.shared.createTransactionWith(date: Date(), monthYearDate: returnFormattedDate(date: Date()), category: "", payee: payee, transactionType: TransactionType.expense.rawValue, amount: amountToSubtract, account: account.name, completion: { (_) in })
+            
+            self.navigationController?.popViewController(animated: true)
+            
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+        
+        alert.addAction(addAction)
+        alert.addAction(cancelAction)
+        present(alert, animated: true, completion: nil)
+        
     }
     
     func addTapGesture() {
@@ -264,6 +315,7 @@ class AccountDetailsViewController: UIViewController, UIPickerViewDelegate, UIPi
         transferFundsButton.layer.cornerRadius = transferFundsButton.frame.height/4
         cancelButton.layer.cornerRadius = cancelButton.frame.height/4
         transferButton.layer.cornerRadius = transferButton.frame.height/4
+        payMeOffButton.layer.cornerRadius = payMeOffButton.frame.height/4
     }
     
     @objc func dissmissKeyboard() {
